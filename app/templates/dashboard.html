@@ -3,11 +3,18 @@
 {% block content %}
 <div class="row mb-4">
     <div class="col">
-        <h2>Welcome, {{ current_user.username }}</h2>
-        <p class="text-muted">Monitor your blood pressure health history</p>
+        <div class="d-flex align-items-center">
+            <div class="me-3">
+                <i class="bi bi-person-circle display-4 text-primary"></i>
+            </div>
+            <div>
+                <h2 class="mb-1">Welcome, {{ current_user.username }}</h2>
+                <p class="text-muted mb-0">Monitor your blood pressure health history</p>
+            </div>
+        </div>
     </div>
     <div class="col-auto">
-        <a href="{{ url_for('assessment') }}" class="btn btn-primary">
+        <a href="{{ url_for('assessment') }}" class="btn btn-primary btn-lg">
             <i class="bi bi-plus-circle me-2"></i>New Assessment
         </a>
     </div>
@@ -15,38 +22,72 @@
 
 <div class="row mb-4">
     <div class="col-md-8">
-        <div class="card shadow">
+        <div class="card shadow-sm border-0">
             <div class="card-body">
-                <h5 class="card-title">Blood Pressure Trends</h5>
-                <div class="btn-group mb-3" role="group">
-                    <button type="button" class="btn btn-outline-primary active" data-period="all">All</button>
-                    <button type="button" class="btn btn-outline-primary" data-period="7">Last 7 Days</button>
-                    <button type="button" class="btn btn-outline-primary" data-period="30">Last 30 Days</button>
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <h5 class="card-title mb-0">
+                        <i class="bi bi-graph-up me-2 text-primary"></i>Blood Pressure Trends
+                    </h5>
+                    <div class="btn-group" role="group">
+                        <button type="button" class="btn btn-outline-primary active" data-period="all">
+                            <i class="bi bi-calendar-check me-1"></i>All
+                        </button>
+                        <button type="button" class="btn btn-outline-primary" data-period="7">
+                            <i class="bi bi-calendar-week me-1"></i>7 Days
+                        </button>
+                        <button type="button" class="btn btn-outline-primary" data-period="30">
+                            <i class="bi bi-calendar-month me-1"></i>30 Days
+                        </button>
+                    </div>
                 </div>
-                <canvas id="bpChart"></canvas>
+                <div class="chart-container">
+                    <canvas id="bpChart" height="300"></canvas>
+                </div>
             </div>
         </div>
     </div>
     <div class="col-md-4">
-        <div class="card shadow mb-4">
+        <div class="card shadow-sm border-0 mb-4">
             <div class="card-body">
-                <h5 class="card-title">Latest Assessment</h5>
+                <h5 class="card-title mb-4">
+                    <i class="bi bi-clock-history me-2 text-primary"></i>Latest Assessment
+                </h5>
                 {% if assessments %}
-                    <div class="mb-3">
-                        <p class="mb-1">Date: {{ assessments[0].date.strftime('%Y-%m-%d') }}</p>
-                        <p class="mb-1">Systolic: {{ assessments[0].systolic }} mmHg</p>
-                        <p class="mb-1">Diastolic: {{ assessments[0].diastolic }} mmHg</p>
-                        <p class="mb-1">Heart Rate: {{ assessments[0].heart_rate }} bpm</p>
-                        <p class="mb-1">Risk Status: 
-                            <span class="badge {% if assessments[0].risk_status == 'High Risk' %}bg-danger{% else %}bg-success{% endif %}">
+                    <div class="mb-4">
+                        <div class="d-flex justify-content-between mb-2">
+                            <span class="text-muted">Date</span>
+                            <span class="fw-medium">{{ assessments[0].date.strftime('%Y-%m-%d') }}</span>
+                        </div>
+                        <div class="d-flex justify-content-between mb-2">
+                            <span class="text-muted">Systolic</span>
+                            <span class="fw-medium">{{ assessments[0].systolic }} mmHg</span>
+                        </div>
+                        <div class="d-flex justify-content-between mb-2">
+                            <span class="text-muted">Diastolic</span>
+                            <span class="fw-medium">{{ assessments[0].diastolic }} mmHg</span>
+                        </div>
+                        <div class="d-flex justify-content-between mb-2">
+                            <span class="text-muted">Heart Rate</span>
+                            <span class="fw-medium">{{ assessments[0].heart_rate }} bpm</span>
+                        </div>
+                        <div class="d-flex justify-content-between align-items-center">
+                            <span class="text-muted">Risk Status</span>
+                            <span class="badge {% if assessments[0].risk_status == 'High Risk' %}bg-danger{% else %}bg-success{% endif %} px-3 py-2">
                                 {{ assessments[0].risk_status }}
                             </span>
-                        </p>
+                        </div>
                     </div>
-                    <a href="{{ url_for('results', assessment_id=assessments[0].id) }}" class="btn btn-outline-primary">View Details</a>
+                    <a href="{{ url_for('results', assessment_id=assessments[0].id) }}" class="btn btn-outline-primary w-100">
+                        <i class="bi bi-eye me-2"></i>View Details
+                    </a>
                 {% else %}
-                    <p class="text-muted">No assessments yet</p>
-                    <a href="{{ url_for('assessment') }}" class="btn btn-primary">Start Assessment</a>
+                    <div class="text-center py-4">
+                        <i class="bi bi-clipboard-pulse display-4 text-muted mb-3"></i>
+                        <p class="text-muted mb-4">No assessments yet</p>
+                        <a href="{{ url_for('assessment') }}" class="btn btn-primary">
+                            <i class="bi bi-plus-circle me-2"></i>Start Assessment
+                        </a>
+                    </div>
                 {% endif %}
             </div>
         </div>
@@ -55,11 +96,13 @@
 
 <div class="row">
     <div class="col-12">
-        <div class="card shadow">
+        <div class="card shadow-sm border-0">
             <div class="card-body">
-                <h5 class="card-title">Assessment History</h5>
+                <h5 class="card-title mb-4">
+                    <i class="bi bi-table me-2 text-primary"></i>Assessment History
+                </h5>
                 <div class="table-responsive">
-                    <table class="table table-hover">
+                    <table class="table table-hover align-middle">
                         <thead>
                             <tr>
                                 <th>Date</th>
@@ -78,12 +121,14 @@
                                 <td>{{ assessment.diastolic }} mmHg</td>
                                 <td>{{ assessment.heart_rate }} bpm</td>
                                 <td>
-                                    <span class="badge {% if assessment.risk_status == 'High Risk' %}bg-danger{% else %}bg-success{% endif %}">
+                                    <span class="badge {% if assessment.risk_status == 'High Risk' %}bg-danger{% else %}bg-success{% endif %} px-3 py-1">
                                         {{ assessment.risk_status }}
                                     </span>
                                 </td>
                                 <td>
-                                    <a href="{{ url_for('results', assessment_id=assessment.id) }}" class="btn btn-sm btn-outline-primary">View</a>
+                                    <a href="{{ url_for('results', assessment_id=assessment.id) }}" class="btn btn-sm btn-outline-primary">
+                                        <i class="bi bi-eye me-1"></i>View
+                                    </a>
                                 </td>
                             </tr>
                             {% endfor %}
@@ -97,16 +142,46 @@
 {% endblock %}
 
 {% block extra_css %}
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.7.2/font/bootstrap-icons.css">
 <style>
     .card {
-        border: none;
+        border-radius: 1rem;
+        transition: transform 0.2s;
+    }
+    .card:hover {
+        transform: translateY(-2px);
     }
     .table th {
         border-top: none;
+        font-weight: 600;
+        color: #6c757d;
     }
     .badge {
-        font-size: 0.9em;
+        font-weight: 500;
+        letter-spacing: 0.3px;
+    }
+    .btn-group .btn {
+        border-radius: 0.5rem;
+        padding: 0.5rem 1rem;
+    }
+    .btn-group .btn:first-child {
+        border-top-right-radius: 0;
+        border-bottom-right-radius: 0;
+    }
+    .btn-group .btn:last-child {
+        border-top-left-radius: 0;
+        border-bottom-left-radius: 0;
+    }
+    .btn-group .btn:not(:first-child):not(:last-child) {
+        border-radius: 0;
+    }
+    .table > :not(caption) > * > * {
+        padding: 1rem;
+    }
+    /* Chart container styles */
+    .chart-container {
+        position: relative;
+        height: 300px;
+        width: 100%;
     }
 </style>
 {% endblock %}
@@ -127,22 +202,69 @@
                 label: 'Systolic',
                 data: assessments.map(a => a.systolic),
                 borderColor: 'rgb(255, 99, 132)',
-                tension: 0.1
+                backgroundColor: 'rgba(255, 99, 132, 0.1)',
+                tension: 0.4,
+                fill: true
             }, {
                 label: 'Diastolic',
                 data: assessments.map(a => a.diastolic),
                 borderColor: 'rgb(54, 162, 235)',
-                tension: 0.1
+                backgroundColor: 'rgba(54, 162, 235, 0.1)',
+                tension: 0.4,
+                fill: true
             }]
         },
         options: {
             responsive: true,
+            maintainAspectRatio: false,
+            layout: {
+                padding: {
+                    top: 20,
+                    right: 20,
+                    bottom: 20,
+                    left: 20
+                }
+            },
+            plugins: {
+                legend: {
+                    position: 'top',
+                    labels: {
+                        padding: 20,
+                        usePointStyle: true,
+                        font: {
+                            size: 12
+                        }
+                    }
+                }
+            },
             scales: {
                 y: {
                     beginAtZero: false,
                     title: {
                         display: true,
-                        text: 'mmHg'
+                        text: 'mmHg',
+                        font: {
+                            weight: 'bold',
+                            size: 12
+                        }
+                    },
+                    grid: {
+                        color: 'rgba(0, 0, 0, 0.05)'
+                    },
+                    ticks: {
+                        font: {
+                            size: 11
+                        }
+                    }
+                },
+                x: {
+                    grid: {
+                        display: false
+                    },
+                    ticks: {
+                        font: {
+                            size: 11
+                        }
                     }
                 }
             }
