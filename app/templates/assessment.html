@@ -1,0 +1,252 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <div class="card shadow">
+            <div class="card-body p-4">
+                <h2 class="text-center mb-4">Blood Pressure Assessment</h2>
+                <form method="POST" action="{{ url_for('assessment') }}" class="needs-validation" novalidate>
+                    <!-- Personal Information -->
+                    <div class="card mb-4">
+                        <div class="card-header bg-light">
+                            <h5 class="mb-0">Personal Information</h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label for="age" class="form-label">Age</label>
+                                    <input type="number" class="form-control" id="age" name="age" 
+                                           min="18" max="120" required>
+                                    <div class="invalid-feedback">
+                                        Please enter a valid age between 18 and 120 years.
+                                    </div>
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label for="gender" class="form-label">Gender</label>
+                                    <select class="form-select" id="gender" name="gender" required>
+                                        <option value="">Select gender</option>
+                                        <option value="1">Male</option>
+                                        <option value="0">Female</option>
+                                    </select>
+                                    <div class="invalid-feedback">
+                                        Please select your gender.
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Blood Pressure and Heart -->
+                    <div class="card mb-4">
+                        <div class="card-header bg-light">
+                            <h5 class="mb-0">Blood Pressure and Heart</h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label for="systolic" class="form-label">Systolic Pressure (mmHg)</label>
+                                    <input type="number" class="form-control" id="systolic" name="systolic" 
+                                           min="70" max="200" step="0.1" required>
+                                    <div class="invalid-feedback">
+                                        Please enter a valid systolic pressure between 70 and 200 mmHg.
+                                    </div>
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label for="diastolic" class="form-label">Diastolic Pressure (mmHg)</label>
+                                    <input type="number" class="form-control" id="diastolic" name="diastolic" 
+                                           min="40" max="130" step="0.1" required>
+                                    <div class="invalid-feedback">
+                                        Please enter a valid diastolic pressure between 40 and 130 mmHg.
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label for="heart_rate" class="form-label">Heart Rate (bpm)</label>
+                                    <input type="number" class="form-control" id="heart_rate" name="heart_rate" 
+                                           min="40" max="200" required>
+                                    <div class="invalid-feedback">
+                                        Please enter a valid heart rate between 40 and 200 bpm.
+                                    </div>
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label for="bp_medication" class="form-label">Taking BP Medication?</label>
+                                    <select class="form-select" id="bp_medication" name="bp_medication" required>
+                                        <option value="">Select option</option>
+                                        <option value="1">Yes</option>
+                                        <option value="0">No</option>
+                                    </select>
+                                    <div class="invalid-feedback">
+                                        Please indicate if you're taking blood pressure medication.
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Health Metrics -->
+                    <div class="card mb-4">
+                        <div class="card-header bg-light">
+                            <h5 class="mb-0">Health Metrics</h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label for="weight" class="form-label">Weight (kg)</label>
+                                    <input type="number" class="form-control" id="weight" name="weight" 
+                                           min="30" max="300" step="0.1" required>
+                                    <div class="invalid-feedback">
+                                        Please enter a valid weight between 30 and 300 kg.
+                                    </div>
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label for="height" class="form-label">Height (cm)</label>
+                                    <input type="number" class="form-control" id="height" name="height" 
+                                           min="100" max="250" required>
+                                    <div class="invalid-feedback">
+                                        Please enter a valid height between 100 and 250 cm.
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-12 mb-3">
+                                    <label for="total_cholesterol" class="form-label">Total Cholesterol (mg/dL)</label>
+                                    <input type="number" class="form-control" id="total_cholesterol" name="total_cholesterol" 
+                                           min="100" max="500" step="0.1" required>
+                                    <div class="invalid-feedback">
+                                        Please enter a valid total cholesterol level between 100 and 500 mg/dL.
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Medical Conditions -->
+                    <div class="card mb-4">
+                        <div class="card-header bg-light">
+                            <h5 class="mb-0">Medical Conditions</h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label for="diabetes" class="form-label">Diabetes</label>
+                                    <select class="form-select" id="diabetes" name="diabetes" required>
+                                        <option value="">Select option</option>
+                                        <option value="1">Yes</option>
+                                        <option value="0">No</option>
+                                    </select>
+                                    <div class="invalid-feedback">
+                                        Please indicate if you have diabetes.
+                                    </div>
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label for="blood_glucose" class="form-label">Blood Glucose (mg/dL)</label>
+                                    <input type="number" class="form-control" id="blood_glucose" name="blood_glucose" 
+                                           min="50" max="400" step="0.1" required>
+                                    <div class="invalid-feedback">
+                                        Please enter a valid blood glucose level between 50 and 400 mg/dL.
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label for="smoking_status" class="form-label">Smoking Status</label>
+                                    <select class="form-select" id="smoking_status" name="smoking_status" required>
+                                        <option value="">Select smoking status</option>
+                                        <option value="1">Current Smoker</option>
+                                        <option value="0">Non-smoker</option>
+                                    </select>
+                                    <div class="invalid-feedback">
+                                        Please select your smoking status.
+                                    </div>
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label for="cigs_per_day" class="form-label">Cigarettes per Day</label>
+                                    <input type="number" class="form-control" id="cigs_per_day" name="cigs_per_day" 
+                                           min="0" max="100" required>
+                                    <div class="invalid-feedback">
+                                        Please enter a valid number of cigarettes per day (0-100).
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Hidden BMI field -->
+                    <input type="hidden" id="bmi" name="bmi" required>
+
+                    <div class="d-grid gap-2">
+                        <button type="submit" class="btn btn-primary btn-lg">
+                            <i class="bi bi-clipboard-check me-2"></i>Analyze
+                        </button>
+                        <a href="{{ url_for('dashboard') }}" class="btn btn-outline-secondary">
+                            <i class="bi bi-arrow-left me-2"></i>Back to Dashboard
+                        </a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.7.2/font/bootstrap-icons.css">
+<style>
+    .card {
+        border: none;
+    }
+    .form-control:focus {
+        box-shadow: 0 0 0 0.2rem rgba(13, 110, 253, 0.15);
+    }
+    .card-header {
+        background-color: #f8f9fa;
+        border-bottom: 1px solid rgba(0,0,0,.125);
+    }
+</style>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+// Form validation
+(function () {
+    'use strict'
+    var forms = document.querySelectorAll('.needs-validation')
+    Array.prototype.slice.call(forms).forEach(function (form) {
+        form.addEventListener('submit', function (event) {
+            if (!form.checkValidity()) {
+                event.preventDefault()
+                event.stopPropagation()
+            }
+            form.classList.add('was-validated')
+        }, false)
+    })
+})()
+
+// Calculate BMI
+function calculateBMI() {
+    const weight = parseFloat(document.getElementById('weight').value);
+    const height = parseFloat(document.getElementById('height').value) / 100; // Convert to meters
+    if (weight && height) {
+        const bmi = weight / (height * height);
+        document.getElementById('bmi').value = bmi.toFixed(1);
+        return true;
+    }
+    return false;
+}
+
+// Add event listeners for weight and height inputs
+document.getElementById('weight').addEventListener('input', calculateBMI);
+document.getElementById('height').addEventListener('input', calculateBMI);
+
+// Validate form submission
+document.querySelector('form').addEventListener('submit', function(event) {
+    if (!calculateBMI()) {
+        event.preventDefault();
+        alert('Please enter both weight and height to calculate BMI');
+        return false;
+    }
+});
+</script>
+{% endblock %} 

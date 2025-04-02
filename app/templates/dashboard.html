@@ -1,0 +1,178 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col">
+        <h2>Welcome, {{ current_user.username }}</h2>
+        <p class="text-muted">Monitor your blood pressure health history</p>
+    </div>
+    <div class="col-auto">
+        <a href="{{ url_for('assessment') }}" class="btn btn-primary">
+            <i class="bi bi-plus-circle me-2"></i>New Assessment
+        </a>
+    </div>
+</div>
+
+<div class="row mb-4">
+    <div class="col-md-8">
+        <div class="card shadow">
+            <div class="card-body">
+                <h5 class="card-title">Blood Pressure Trends</h5>
+                <div class="btn-group mb-3" role="group">
+                    <button type="button" class="btn btn-outline-primary active" data-period="all">All</button>
+                    <button type="button" class="btn btn-outline-primary" data-period="7">Last 7 Days</button>
+                    <button type="button" class="btn btn-outline-primary" data-period="30">Last 30 Days</button>
+                </div>
+                <canvas id="bpChart"></canvas>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card shadow mb-4">
+            <div class="card-body">
+                <h5 class="card-title">Latest Assessment</h5>
+                {% if assessments %}
+                    <div class="mb-3">
+                        <p class="mb-1">Date: {{ assessments[0].date.strftime('%Y-%m-%d') }}</p>
+                        <p class="mb-1">Systolic: {{ assessments[0].systolic }} mmHg</p>
+                        <p class="mb-1">Diastolic: {{ assessments[0].diastolic }} mmHg</p>
+                        <p class="mb-1">Heart Rate: {{ assessments[0].heart_rate }} bpm</p>
+                        <p class="mb-1">Risk Status: 
+                            <span class="badge {% if assessments[0].risk_status == 'High Risk' %}bg-danger{% else %}bg-success{% endif %}">
+                                {{ assessments[0].risk_status }}
+                            </span>
+                        </p>
+                    </div>
+                    <a href="{{ url_for('results', assessment_id=assessments[0].id) }}" class="btn btn-outline-primary">View Details</a>
+                {% else %}
+                    <p class="text-muted">No assessments yet</p>
+                    <a href="{{ url_for('assessment') }}" class="btn btn-primary">Start Assessment</a>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-12">
+        <div class="card shadow">
+            <div class="card-body">
+                <h5 class="card-title">Assessment History</h5>
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>Date</th>
+                                <th>Systolic</th>
+                                <th>Diastolic</th>
+                                <th>Heart Rate</th>
+                                <th>Risk Status</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for assessment in assessments %}
+                            <tr>
+                                <td>{{ assessment.date.strftime('%Y-%m-%d') }}</td>
+                                <td>{{ assessment.systolic }} mmHg</td>
+                                <td>{{ assessment.diastolic }} mmHg</td>
+                                <td>{{ assessment.heart_rate }} bpm</td>
+                                <td>
+                                    <span class="badge {% if assessment.risk_status == 'High Risk' %}bg-danger{% else %}bg-success{% endif %}">
+                                        {{ assessment.risk_status }}
+                                    </span>
+                                </td>
+                                <td>
+                                    <a href="{{ url_for('results', assessment_id=assessment.id) }}" class="btn btn-sm btn-outline-primary">View</a>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.7.2/font/bootstrap-icons.css">
+<style>
+    .card {
+        border: none;
+    }
+    .table th {
+        border-top: none;
+    }
+    .badge {
+        font-size: 0.9em;
+    }
+</style>
+{% endblock %}
+
+{% block extra_js %}
+<script src="{{ url_for('static', filename='js/chart.min.js') }}"></script>
+<script>
+    // Prepare data for the chart
+    const assessments = {{ assessments_data|tojson|safe }};
+    
+    // Create chart
+    const ctx = document.getElementById('bpChart').getContext('2d');
+    const bpChart = new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: assessments.map(a => a.date),
+            datasets: [{
+                label: 'Systolic',
+                data: assessments.map(a => a.systolic),
+                borderColor: 'rgb(255, 99, 132)',
+                tension: 0.1
+            }, {
+                label: 'Diastolic',
+                data: assessments.map(a => a.diastolic),
+                borderColor: 'rgb(54, 162, 235)',
+                tension: 0.1
+            }]
+        },
+        options: {
+            responsive: true,
+            scales: {
+                y: {
+                    beginAtZero: false,
+                    title: {
+                        display: true,
+                        text: 'mmHg'
+                    }
+                }
+            }
+        }
+    });
+
+    // Handle period filter buttons
+    document.querySelectorAll('[data-period]').forEach(button => {
+        button.addEventListener('click', function() {
+            // Update active state
+            document.querySelectorAll('[data-period]').forEach(btn => btn.classList.remove('active'));
+            this.classList.add('active');
+
+            // Filter data based on period
+            const period = this.dataset.period;
+            const now = new Date();
+            const filteredData = assessments.filter(a => {
+                if (period === 'all') return true;
+                const assessmentDate = new Date(a.date);
+                const diffTime = Math.abs(now - assessmentDate);
+                const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+                return diffDays <= parseInt(period);
+            });
+
+            // Update chart
+            bpChart.data.labels = filteredData.map(a => a.date);
+            bpChart.data.datasets[0].data = filteredData.map(a => a.systolic);
+            bpChart.data.datasets[1].data = filteredData.map(a => a.diastolic);
+            bpChart.update();
+        });
+    });
+</script>
+{% endblock %} 
