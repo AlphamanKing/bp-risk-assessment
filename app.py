@@ -70,7 +70,7 @@ class Assessment(db.Model):
 
 @login_manager.user_loader
 def load_user(user_id):
-    return User.query.get(int(user_id))
+    return db.session.get(User, int(user_id))
 
 # Routes
 @app.route('/')
@@ -323,47 +323,55 @@ def generate_recommendations(risk_status, systolic, diastolic, bmi, prediction_p
                           cigs_per_day):
     recommendations = []
     
-    # Add confidence level to recommendations
-    confidence = prediction_proba[1] if risk_status == "High Risk" else prediction_proba[0]
-    recommendations.append(f"Confidence Level: {confidence:.2%}")
-    
+    # General recommendations based on risk status
     if risk_status == "High Risk":
-        recommendations.append("Schedule an appointment with your healthcare provider immediately.")
-        recommendations.append("Monitor your blood pressure daily.")
-        recommendations.append("Reduce sodium intake to less than 1500mg per day.")
-        recommendations.append("Exercise regularly (30 minutes of moderate activity 5 times per week).")
-        recommendations.append("Manage stress through meditation or relaxation techniques.")
+        recommendations.append("⚠️ Important: Schedule an appointment with your healthcare provider immediately.")
+        recommendations.append("📊 Monitor your blood pressure daily and keep a log of readings.")
+        recommendations.append("🍽️ Reduce sodium intake to less than 1500mg per day.")
+        recommendations.append("🏃 Exercise regularly (30 minutes of moderate activity 5 times per week).")
+        recommendations.append("🧘 Manage stress through meditation or relaxation techniques.")
+        recommendations.append("💊 Take prescribed medications as directed by your healthcare provider.")
     else:
-        recommendations.append("Continue monitoring your blood pressure regularly.")
-        recommendations.append("Maintain a healthy diet rich in fruits and vegetables.")
-        recommendations.append("Stay physically active.")
-        recommendations.append("Keep stress levels in check.")
+        recommendations.append("✅ Continue monitoring your blood pressure regularly.")
+        recommendations.append("🥗 Maintain a healthy diet rich in fruits and vegetables.")
+        recommendations.append("🏃 Stay physically active with regular exercise.")
+        recommendations.append("🧘 Keep stress levels in check through relaxation techniques.")
+        recommendations.append("📅 Schedule regular check-ups with your healthcare provider.")
     
-    # Add specific recommendations based on measurements and conditions
+    # Specific recommendations based on measurements and conditions
     if systolic > 140 or diastolic > 90:
-        recommendations.append("Your blood pressure readings are elevated. Consider lifestyle changes and consult a healthcare provider.")
+        recommendations.append("⚠️ Your blood pressure readings are elevated. Consider lifestyle changes and consult a healthcare provider.")
+        recommendations.append("🍽️ Focus on the DASH diet (Dietary Approaches to Stop Hypertension).")
     elif systolic < 90 or diastolic < 60:
-        recommendations.append("Your blood pressure readings are low. Monitor for symptoms and consult a healthcare provider if concerned.")
+        recommendations.append("⚠️ Your blood pressure readings are low. Monitor for symptoms and consult a healthcare provider if concerned.")
+        recommendations.append("💧 Stay well-hydrated and consider increasing salt intake if advised by your doctor.")
     
     if bmi > 25:
-        recommendations.append("Work on maintaining a healthy weight through diet and exercise.")
+        recommendations.append("⚖️ Your BMI indicates overweight. Work on maintaining a healthy weight through diet and exercise.")
+        recommendations.append("🍽️ Consider consulting a registered dietitian for personalized dietary advice.")
     elif bmi < 18.5:
-        recommendations.append("Consider consulting a nutritionist to ensure you're maintaining a healthy weight.")
-    
-    if total_cholesterol > 200:
-        recommendations.append("Your cholesterol levels are elevated. Consider dietary changes and exercise to improve cholesterol levels.")
-    
-    if blood_glucose > 126:
-        recommendations.append("Your blood glucose levels are elevated. Monitor your blood sugar regularly and consult a healthcare provider.")
-    
-    if smoking_status:
-        recommendations.append(f"Quitting smoking is highly recommended to improve your cardiovascular health. You currently smoke {cigs_per_day} cigarettes per day.")
-    
-    if bp_medication:
-        recommendations.append("Continue taking your blood pressure medication as prescribed.")
+        recommendations.append("⚖️ Your BMI indicates underweight. Consider consulting a healthcare provider about healthy weight gain strategies.")
     
     if diabetes:
-        recommendations.append("Monitor your blood glucose levels regularly and follow your diabetes management plan.")
+        recommendations.append("🩸 Maintain strict blood glucose control through diet, exercise, and medication as prescribed.")
+        recommendations.append("👣 Check your feet daily for any signs of complications.")
+    
+    if smoking_status:
+        recommendations.append("🚭 Smoking significantly increases cardiovascular risk. Consider smoking cessation programs.")
+        recommendations.append("💪 Seek support for quitting smoking through healthcare providers or support groups.")
+    
+    if total_cholesterol > 200:
+        recommendations.append("🫀 Your cholesterol is elevated. Focus on heart-healthy foods and regular exercise.")
+        recommendations.append("🥑 Include omega-3 rich foods in your diet (fish, nuts, seeds).")
+    
+    if blood_glucose > 126:
+        recommendations.append("🩸 Your blood glucose is elevated. Monitor regularly and follow your diabetes management plan.")
+        recommendations.append("🍽️ Limit refined carbohydrates and sugary foods.")
+    
+    # Add lifestyle recommendations
+    recommendations.append("🌙 Aim for 7-9 hours of quality sleep each night.")
+    recommendations.append("💧 Stay hydrated with 8-10 glasses of water daily.")
+    recommendations.append("🧘 Practice stress management techniques regularly.")
     
     return "\n".join(recommendations)
 
